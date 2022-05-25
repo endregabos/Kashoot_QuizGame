@@ -5,19 +5,28 @@ import com.project.kashoot.model.User;
 import com.project.kashoot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/")
 public class UserController {
+    SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
     private UserRepository userRepository;
+
+    public UserController(SimpMessagingTemplate simpMessagingTemplate){
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
 
     // get users
     @CrossOrigin(origins = "http://localhost:8080")
@@ -28,7 +37,7 @@ public class UserController {
 
     // get user by id
     @CrossOrigin(origins = "http://localhost:8080")
-    @GetMapping("/users/{id}")
+    @GetMapping("users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable(value = "id") Long user_id) throws ResourceNotFoundException {
         User user = userRepository.findById(user_id).orElseThrow(() -> new ResourceNotFoundException("User not found for this id :: " + user_id));
 
@@ -52,6 +61,8 @@ public class UserController {
         user.setUser_password(userDetails.getUser_password());
         user.setUser_isAdmin(userDetails.isUser_isAdmin());
 
+        simpMessagingTemplate.convertAndSend("/websockets", "Admin edited a user.");
+
         return ResponseEntity.ok(this.userRepository.save(user));
     }
 
@@ -69,11 +80,17 @@ public class UserController {
         return response;
     }
 
-//    //login user
+    //login user
     @CrossOrigin(origins = "http://localhost:8080")
-    @PostMapping("login")
-    public List<User> findByName(String user_name){
-        return userRepository.findByName(user_name);
+    @GetMapping("/login/{username}/{userpassword}")
+    public Optional<User> getUserByUsernameAndUserpassword(@PathVariable(value = "username") String username, @PathVariable(value = "userpassword") String userpassword){
+        return userRepository.findUserByUsernameAndUserpassword(username, userpassword);
+    }
+
+    @MessageMapping("/notification")
+    @SendTo("/websockets")
+    public String sendNotification(String message) throws Exception {
+        return message;
     }
 
 }

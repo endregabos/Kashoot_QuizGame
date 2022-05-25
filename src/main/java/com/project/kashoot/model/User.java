@@ -11,22 +11,22 @@ public class User {
     private long user_id;
 
     @Column(name = "user_name", nullable = false)
-    private String user_name;
+    private String username;
 
     @Column(name = "user_password", nullable = false)
-    private String user_password;
+    private String userpassword;
 
-    @Column(name = "user_isAdmin", nullable = false)
+    @Column(name = "user_is_admin", nullable = false)
     private boolean user_isAdmin;
 
     public User() {
         super();
     }
 
-    public User(String user_name, String user_password, boolean user_isAdmin) {
-        this.user_name = user_name;
-        this.user_password = user_password;
-        this.user_isAdmin = user_isAdmin;
+    public User(String username, String userpassword, boolean userisAdmin) {
+        this.username = username;
+        this.userpassword = userpassword;
+        this.user_isAdmin = userisAdmin;
     }
 
     public long getUser_id() {
@@ -38,19 +38,19 @@ public class User {
     }
 
     public String getUser_name() {
-        return user_name;
+        return username;
     }
 
     public void setUser_name(String user_name) {
-        this.user_name = user_name;
+        this.username = user_name;
     }
 
     public String getUser_password() {
-        return user_password;
+        return userpassword;
     }
 
     public void setUser_password(String user_password) {
-        this.user_password = user_password;
+        this.userpassword = user_password;
     }
 
     public boolean isUser_isAdmin() {
@@ -63,6 +63,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [user_id=" + user_id + ", user_name=" + user_name + ", user_password=" + user_password + ", user_isAdmin=" + user_isAdmin + "]";
+        return "User [user_id=" + user_id + ", user_name=" + username + ", user_password=" + userpassword + ", user_isAdmin=" + user_isAdmin + "]";
     }
 }
